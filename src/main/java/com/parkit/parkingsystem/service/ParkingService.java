@@ -5,6 +5,7 @@ import java.util.Optional;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.joda.time.LocalDateTime;
 
 import com.parkit.parkingsystem.constants.ParkingType;
 import com.parkit.parkingsystem.dao.ParkingSpotDAO;
@@ -12,6 +13,12 @@ import com.parkit.parkingsystem.dao.TicketDAO;
 import com.parkit.parkingsystem.model.ParkingSpot;
 import com.parkit.parkingsystem.model.Ticket;
 import com.parkit.parkingsystem.util.InputReaderUtil;
+
+/**
+ * 
+ * Ensure the like between the costumer and the different services of the application.
+ *
+ */
 
 public class ParkingService {
 
@@ -29,16 +36,23 @@ public class ParkingService {
 		this.ticketDAO = ticketDAO;
 	}
 
+	/**
+	 * Set a new ticket when a vehicle enter into the parking.
+	 */
 	public void processIncomingVehicle() {
 		try {
 			ParkingSpot parkingSpot = getNextParkingNumberIfAvailable();
 			if (parkingSpot != null && parkingSpot.getId() > 0) {
 				String vehicleRegNumber = getVehicleRegNumber();
+				
+				vehicleRegNumber = searchExistingParkedVehicle(vehicleRegNumber);
+
 				parkingSpot.setAvailable(false);
 				parkingSpotDAO.updateParking(parkingSpot);// allot this parking space and mark it's availability as
 															// false
 
 				Date inTime = new Date();
+				//LocalDateTime inTime = new LocalDateTime();
 				Ticket ticket = new Ticket();
 				// ID, PARKING_NUMBER, VEHICLE_REG_NUMBER, PRICE, IN_TIME, OUT_TIME)
 				ticket.setParkingSpot(parkingSpot);
@@ -56,27 +70,33 @@ public class ParkingService {
 		}
 	}
 
+	/**
+	 * 
+	 * @return the registration number of the vehicle.
+	 * @throws Exception
+	 */
+	
 	public String getVehicleRegNumber() throws Exception {
 		System.out.println("Please type the vehicle registration number and press enter key");
-		/*
-		 * inputReaderUtil.readVehicleRegistrationNumber();
-		 * searchAlreadyParkedVehicle(); while {search return Ticket){ System.out.
-		 * println("The vehicle with this registration number is already parked.\n " +
-		 * "Please type another registration number and press enter key.");
-		 * inputReaderUtil.readVehicleRegistrationNumber();
-		 * searchAlreadyParkedVehicle(); } }
-		 */
-
 		return inputReaderUtil.readVehicleRegistrationNumber();
 	}
 
-	/*
-	 * public Ticket searchAlredyParkedVehicle() throws Exception { constante DB qui
-	 * cherche Ticket
-	 * 
-	 * return optional.Ticket ; }
-	 */
+	public String searchExistingParkedVehicle(String vehicleRegNumber) throws Exception {
+		Optional<Ticket> parkedVehicle = ticketDAO.getExistingParkedVehicleTicket(vehicleRegNumber);
+		while (parkedVehicle.isPresent()) {
+			parkedVehicle = null;
+			System.out.println("The vehicle with this registration number is already parked.\n"
+					+ "Please type another registration number and press enter key.");
+			vehicleRegNumber = inputReaderUtil.readVehicleRegistrationNumber();
+			parkedVehicle = ticketDAO.getExistingParkedVehicleTicket(vehicleRegNumber);	
+		}
+		return vehicleRegNumber;
+	}
 
+	/**
+	 * Give the next free parking spot or indicate if the parking is full.
+	 * @return the parkingSpot.
+	 */
 	public ParkingSpot getNextParkingNumberIfAvailable() {
 		int parkingNumber = 0;
 		ParkingSpot parkingSpot = null;
@@ -96,6 +116,11 @@ public class ParkingService {
 		return parkingSpot;
 	}
 
+	
+	/**
+	 * 
+	 * @return the type of the vehicle.
+	 */
 	private ParkingType getVehicleType() {
 		System.out.println("Please select vehicle type from menu");
 		System.out.println("1 CAR");
@@ -115,6 +140,10 @@ public class ParkingService {
 		}
 	}
 
+	/**
+	 * 
+	 * Update the ticket of an exiting costumer and give him the fare.
+	 */
 	public void processExitingVehicle() {
 		try {
 			String vehicleRegNumber = getVehicleRegNumber();
@@ -123,12 +152,7 @@ public class ParkingService {
 			ticket.setOutTime(outTime);
 
 			Optional<Ticket> regularCustomerTicket = ticketDAO.getPreviousRegistration(vehicleRegNumber);
-			boolean regularCustomer = regularCustomerTicket.isPresent() ;
-			/*if (regularCustomerTicket.isPresent()) {
-				fareCalculatorService.calculateFareForRegularCustomer(ticket);
-			} else {
-				
-			}*/
+			boolean regularCustomer = regularCustomerTicket.isPresent();
 			fareCalculatorService.calculateFare(ticket, regularCustomer);
 
 			if (ticketDAO.updateTicket(ticket)) {

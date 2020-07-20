@@ -1,5 +1,6 @@
 package com.parkit.parkingsystem;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.verify;
@@ -63,24 +64,23 @@ public class ParkingServiceTest {
         }
     }
     
-    
-    
-    
-    /*
+   
     @Test
-    public void alreadyParkedRegNumberTest() throws Exception {
-    	when(ticketDAO.getParkedVehicleTickets(Mockito.eq("ABCD"))).thenReturn(Optional.of(new Ticket()));
-    	when(ticketDAO.getParkedVehicleTickets(Mockito.eq("EFGH"))).thenReturn(Optional.empty());
-    	when(inputReaderUtil.readVehicleRegistrationNumber()).thenReturn("ABCD").thenReturn("EFGH");
+    public void testToEnterWithAnExistingRegNumberThenANewOne() throws Exception {
+    	when(ticketDAO.getExistingParkedVehicleTicket(Mockito.eq("ABCD"))).thenReturn(Optional.of(new Ticket()));
+    	when(ticketDAO.getExistingParkedVehicleTicket(Mockito.eq("EFGH"))).thenReturn(Optional.empty());
+    	when(inputReaderUtil.readVehicleRegistrationNumber()).thenReturn("EFGH");
+    	//when(inputReaderUtil.readVehicleRegistrationNumber()).thenReturn("ABCD").thenReturn("EFGH");
     	
     	
-    	String result = parkingService.getVehicleRegNumber();
-        verify(ticketDAO, Mockito.times(2)).getParkedVehicleTickets(anyString());
+    	String result = parkingService.searchExistingParkedVehicle("ABCD");
+        verify(ticketDAO, Mockito.times(2)).getExistingParkedVehicleTicket(anyString());
         assertEquals("EFGH",result);
     }
-    */
     
     
+
+   /*
     @Test
     public void discountForRegularCustomerTest() {
     	fareCalculatorService = new FareCalculatorService();
@@ -90,27 +90,9 @@ public class ParkingServiceTest {
     	
         verify(fareCalculatorService, Mockito.times(1)).calculateFareForRegularCustomer(any(Ticket.class));
     }
+    */
      
- /*   processExitingVehicle() {
-			PARKING SERVICE String vehicleRegNumber = getVehicleRegNumber();
-			MOCK TICKETDAO + NEW TICKET Ticket ticket = ticketDAO.getTicket(vehicleRegNumber);
-			Date outTime = new Date();
-			ticket.setOutTime(outTime);
-
-			MOCK TICKET DAO Optional<Ticket> regularClientTicket = ticketDAO.getPreviousRegistration(vehicleRegNumber);
-			if (regularClientTicket.isPresent()) {
-				fareCalculatorService.calculateFareForRegularCustomer(ticket);
-			} else {
-				fareCalculatorService.calculateFare(ticket);
-			}
-
-			if (ticketDAO.updateTicket(ticket)) {
-				ParkingSpot parkingSpot = ticket.getParkingSpot();
-				parkingSpot.setAvailable(true);
-				parkingSpotDAO.updateParking(parkingSpot);
-				System.out.println("Please pay the parking fare:" + ticket.getPrice());
-				System.out.println(
-						"Recorded out-time for vehicle number:" + ticket.getVehicleRegNumber()*/
+ 
     @Test
     public void processExitingVehicleTest() throws Exception{
     	when(inputReaderUtil.readVehicleRegistrationNumber()).thenReturn("ABCDEF");

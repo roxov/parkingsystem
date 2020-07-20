@@ -13,6 +13,13 @@ import static org.junit.jupiter.api.Assertions.*;
 
 import java.util.Date;
 
+/**
+ * 
+ * Test different cases of price calculation
+ *
+ */
+
+
 public class FareCalculatorServiceTest {
 
     private static FareCalculatorService fareCalculatorService;

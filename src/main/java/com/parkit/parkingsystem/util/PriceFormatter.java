@@ -3,8 +3,19 @@ package com.parkit.parkingsystem.util;
 import java.math.RoundingMode;
 import java.text.DecimalFormat;
 
+/**
+ * 
+ * Format the price with cents.
+ * 
+ */
+
 public class PriceFormatter {
 
+	/**
+	 * 
+	 * @param price
+	 * @return formatted price
+	 */
 	public double formatPrice (double price) {
 		DecimalFormat df = new DecimalFormat();
 		df.setMaximumFractionDigits(2);

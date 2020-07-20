@@ -6,10 +6,20 @@ import com.parkit.parkingsystem.util.InputReaderUtil;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+/**
+ * 
+ * Establish the like between the parking system and the costumer for the entrance to the application.
+ *
+ */
+
 public class InteractiveShell {
 
     private static final Logger logger = LogManager.getLogger("InteractiveShell");
 
+    /**
+     * After each action of costumers, give them 3 choices :
+     * shutdown the application, enter or exit the parking.
+     */
     public static void loadInterface(){
         logger.info("App initialized!!!");
         System.out.println("Welcome to Parking System!");
