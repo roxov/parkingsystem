@@ -1,9 +1,13 @@
 package com.parkit.parkingsystem.config;
 
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-
-import java.sql.*;
 
 /**
  * 
@@ -14,9 +18,7 @@ import java.sql.*;
 public class DataBaseConfig {
 
 	private static final Logger logger = LogManager.getLogger("DataBaseConfig");
-	PreparedStatement ps = null ;
-	Connection con = null;
-	
+
 	public Connection getConnection() throws ClassNotFoundException, SQLException {
 		logger.info("Create DB connection");
 		Class.forName("com.mysql.cj.jdbc.Driver");
@@ -54,25 +56,6 @@ public class DataBaseConfig {
 				logger.error("Error while closing result set", e);
 			}
 		}
-	}
-
-	/**
-	 * 
-	 * @param an SQLrequest from DBConstants
-	 * @return the PreparedStatement corresponding to the given SQL request.
-	 * @throws ClassNotFoundException
-	 * @throws SQLException
-	 */
-	
-	public PreparedStatement requestDataBase(String SQLrequest) throws ClassNotFoundException, SQLException {
-		con = getConnection();
-		ps = con.prepareStatement(SQLrequest);
-		return ps;
-	}
-
-	public void closeConnectionToDataBase() {
-		closeConnection(con);
-		closePreparedStatement(ps);
 	}
 
 }

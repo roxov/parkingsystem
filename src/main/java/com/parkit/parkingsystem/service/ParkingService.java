@@ -5,7 +5,6 @@ import java.util.Optional;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.joda.time.LocalDateTime;
 
 import com.parkit.parkingsystem.constants.ParkingType;
 import com.parkit.parkingsystem.dao.ParkingSpotDAO;
@@ -16,7 +15,8 @@ import com.parkit.parkingsystem.util.InputReaderUtil;
 
 /**
  * 
- * Ensure the like between the costumer and the different services of the application.
+ * Ensure the like between the costumer and the different services of the
+ * application.
  *
  */
 
@@ -44,7 +44,7 @@ public class ParkingService {
 			ParkingSpot parkingSpot = getNextParkingNumberIfAvailable();
 			if (parkingSpot != null && parkingSpot.getId() > 0) {
 				String vehicleRegNumber = getVehicleRegNumber();
-				
+
 				vehicleRegNumber = searchExistingParkedVehicle(vehicleRegNumber);
 
 				parkingSpot.setAvailable(false);
@@ -52,7 +52,8 @@ public class ParkingService {
 															// false
 
 				Date inTime = new Date();
-				//LocalDateTime inTime = new LocalDateTime();
+				// LocalDateTime inTime = new LocalDateTime();
+				// inTime = LocalDateTime.now();
 				Ticket ticket = new Ticket();
 				// ID, PARKING_NUMBER, VEHICLE_REG_NUMBER, PRICE, IN_TIME, OUT_TIME)
 				ticket.setParkingSpot(parkingSpot);
@@ -75,7 +76,7 @@ public class ParkingService {
 	 * @return the registration number of the vehicle.
 	 * @throws Exception
 	 */
-	
+
 	public String getVehicleRegNumber() throws Exception {
 		System.out.println("Please type the vehicle registration number and press enter key");
 		return inputReaderUtil.readVehicleRegistrationNumber();
@@ -88,13 +89,14 @@ public class ParkingService {
 			System.out.println("The vehicle with this registration number is already parked.\n"
 					+ "Please type another registration number and press enter key.");
 			vehicleRegNumber = inputReaderUtil.readVehicleRegistrationNumber();
-			parkedVehicle = ticketDAO.getExistingParkedVehicleTicket(vehicleRegNumber);	
+			parkedVehicle = ticketDAO.getExistingParkedVehicleTicket(vehicleRegNumber);
 		}
 		return vehicleRegNumber;
 	}
 
 	/**
 	 * Give the next free parking spot or indicate if the parking is full.
+	 * 
 	 * @return the parkingSpot.
 	 */
 	public ParkingSpot getNextParkingNumberIfAvailable() {
@@ -116,7 +118,6 @@ public class ParkingService {
 		return parkingSpot;
 	}
 
-	
 	/**
 	 * 
 	 * @return the type of the vehicle.

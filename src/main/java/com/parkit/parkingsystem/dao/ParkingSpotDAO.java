@@ -1,5 +1,6 @@
 package com.parkit.parkingsystem.dao;
 
+import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 
@@ -26,11 +27,13 @@ public class ParkingSpotDAO {
 	 * @param the parkingType given by the costumer.
 	 * @return the parkingSpot to park where.
 	 */
-	
+
 	public int getNextAvailableSlot(ParkingType parkingType) {
+		Connection con = null;
 		int result = -1;
 		try {
-			PreparedStatement ps = dataBaseConfig.requestDataBase(DBConstants.GET_NEXT_PARKING_SPOT);
+			con = dataBaseConfig.getConnection();
+			PreparedStatement ps = con.prepareStatement(DBConstants.GET_NEXT_PARKING_SPOT);
 			ps.setString(1, parkingType.toString());
 			ResultSet rs = ps.executeQuery();
 			if (rs.next()) {
@@ -38,33 +41,37 @@ public class ParkingSpotDAO {
 				;
 			}
 			dataBaseConfig.closeResultSet(rs);
+			dataBaseConfig.closePreparedStatement(ps);
 		} catch (Exception ex) {
 			logger.error("Error fetching next available slot", ex);
 		} finally {
-			dataBaseConfig.closeConnectionToDataBase();
+			dataBaseConfig.closeConnection(con);
 		}
 		return result;
 	}
 
 	/**
+	 * Update the availability for that parking spot
 	 * 
 	 * @param the parkingSpot where the vehicle was parked.
 	 * @return a boolean to indicate if the updating is done.
 	 */
-	
+
 	public boolean updateParking(ParkingSpot parkingSpot) {
-		// update the availability for that parking slot
+		Connection con = null;
 		try {
-			PreparedStatement ps = dataBaseConfig.requestDataBase(DBConstants.UPDATE_PARKING_SPOT);
+			con = dataBaseConfig.getConnection();
+			PreparedStatement ps = con.prepareStatement(DBConstants.UPDATE_PARKING_SPOT);
 			ps.setBoolean(1, parkingSpot.isAvailable());
 			ps.setInt(2, parkingSpot.getId());
 			int updateRowCount = ps.executeUpdate();
+			dataBaseConfig.closePreparedStatement(ps);
 			return (updateRowCount == 1);
 		} catch (Exception ex) {
 			logger.error("Error updating parking info", ex);
 			return false;
 		} finally {
-			dataBaseConfig.closeConnectionToDataBase();
+			dataBaseConfig.closeConnection(con);
 		}
 	}
 
