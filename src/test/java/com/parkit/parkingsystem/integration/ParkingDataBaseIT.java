@@ -6,7 +6,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.Mockito.when;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 import java.util.List;
 
 import org.junit.jupiter.api.AfterAll;
@@ -143,7 +143,7 @@ public class ParkingDataBaseIT {
 			throws Exception {
 		// givenInformationForIncomingCar_whenProcessIncomingVehicle_thenVerifyInformationInTicket();
 		when(inputReaderUtil.readVehicleRegistrationNumber()).thenReturn("ABCDEF");
-		Date inTime = new Date();
+		LocalDateTime inTime = LocalDateTime.now();
 		Ticket ticket = new Ticket();
 		ParkingType parkingType = BIKE;
 		int parkingNumber = parkingSpotDAO.getNextAvailableSlot(parkingType);
@@ -165,7 +165,7 @@ public class ParkingDataBaseIT {
 		ParkingSpot savedParkingSpot = savedTicket.getParkingSpot();
 		assertEquals(BIKE, savedParkingSpot.getParkingType());
 		assertEquals("ABCDEF", savedTicket.getVehicleRegNumber());
-		// assertEquals(true, savedParkingSpot.isAvailable());
+		assertEquals(true, savedParkingSpot.isAvailable());
 	}
 
 }

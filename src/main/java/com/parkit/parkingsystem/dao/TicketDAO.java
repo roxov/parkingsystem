@@ -4,7 +4,6 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -44,9 +43,15 @@ public class TicketDAO {
 			ps.setInt(1, ticket.getParkingSpot().getId());
 			ps.setString(2, ticket.getVehicleRegNumber());
 			ps.setDouble(3, ticket.getPrice());
-			ps.setTimestamp(4, new Timestamp(ticket.getInTime().getTime()));
-			ps.setTimestamp(5, (ticket.getOutTime() == null) ? null : (new Timestamp(ticket.getOutTime().getTime())));
-			return ps.execute();
+			ps.setTimestamp(4, java.sql.Timestamp.valueOf(ticket.getInTime()));
+			// ps.setTimestamp(4, new Timestamp(ticket.getInTime().getTime()));
+			ps.setTimestamp(5,
+					(ticket.getOutTime() == null) ? null : (java.sql.Timestamp.valueOf(ticket.getOutTime())));
+			// ps.setTimestamp(5, (ticket.getOutTime() == null) ? null : (new
+			// Timestamp(ticket.getOutTime().getTime())));
+			boolean psExecute = ps.execute();
+			dataBaseConfig.closePreparedStatement(ps);
+			return psExecute;
 		} catch (Exception ex) {
 			logger.error("Error saving ticket", ex);
 		} finally {
@@ -133,6 +138,7 @@ public class TicketDAO {
 				ticket = new Ticket();
 				retrieveTicket(ticket, rs);
 				ticket.setVehicleRegNumber(rs.getString(7));
+				ticket.getParkingSpot().setAvailable(rs.getBoolean(8));
 				ticketsList.add(ticket);
 			}
 			dataBaseConfig.closeResultSet(rs);
@@ -187,9 +193,11 @@ public class TicketDAO {
 			con = dataBaseConfig.getConnection();
 			PreparedStatement ps = con.prepareStatement(DBConstants.UPDATE_TICKET);
 			ps.setDouble(1, ticket.getPrice());
-			ps.setTimestamp(2, new Timestamp(ticket.getOutTime().getTime()));
+			// ps.setTimestamp(2, new Timestamp(ticket.getOutTime().getTime()));
+			ps.setTimestamp(2, java.sql.Timestamp.valueOf(ticket.getOutTime()));
 			ps.setInt(3, ticket.getId());
 			ps.execute();
+			dataBaseConfig.closePreparedStatement(ps);
 			return true;
 		} catch (Exception ex) {
 			logger.error("Error saving ticket info", ex);
@@ -213,8 +221,10 @@ public class TicketDAO {
 		ticket.setParkingSpot(parkingSpot);
 		ticket.setId(rs.getInt(2));
 		ticket.setPrice(rs.getDouble(3));
-		ticket.setInTime(rs.getTimestamp(4));
-		ticket.setOutTime(rs.getTimestamp(5));
+		ticket.setInTime((rs.getTimestamp(4)).toLocalDateTime());
+		ticket.setOutTime((rs.getTimestamp(5) == null) ? null : (rs.getTimestamp(5)).toLocalDateTime());
+		// ticket.setInTime(rs.getTimestamp(4));
+		// ticket.setOutTime(rs.getTimestamp(5));
 	}
 
 }

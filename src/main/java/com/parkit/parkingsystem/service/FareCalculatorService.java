@@ -1,5 +1,8 @@
 package com.parkit.parkingsystem.service;
 
+import java.time.Duration;
+import java.time.LocalDateTime;
+
 import com.parkit.parkingsystem.constants.Fare;
 import com.parkit.parkingsystem.model.Ticket;
 import com.parkit.parkingsystem.util.PriceFormatter;
@@ -23,26 +26,23 @@ public class FareCalculatorService {
 
 	public void calculateFare(Ticket ticket, boolean regularCustomer) {
 
-		if ((ticket.getOutTime() == null) || (ticket.getOutTime().before(ticket.getInTime()))) {
-			// ((ticket.getOutTime() == null) ||
-			// ((ticket.getOutTime().isBefore(ticket.getInTime())))) {
+		if ((ticket.getOutTime() == null) || ((ticket.getOutTime().isBefore(ticket.getInTime())))) {
 			throw new IllegalArgumentException("Out time provided is incorrect:" + ticket.getOutTime().toString());
 		}
 
 		double price = 0;
-
-		long inHour = ticket.getInTime().getTime();
-		long outHour = ticket.getOutTime().getTime();
 		PriceFormatter priceFormatter = new PriceFormatter();
-		double duration = (double) (outHour - inHour) / (1000 * 60 * 60);
 
-		/*
-		 * //Récupère le temps sous forme LocalDateTime au lieu de Timestamp
-		 * LocalDateTime inHour = ticket.getInTime(); LocalDateTime outHour =
-		 * ticket.getOutTime(); Duration duration = Duration.between(inHour, outHour);
-		 */
+		// long inHour = ticket.getInTime().getTime();
+		// long outHour = ticket.getOutTime().getTime();
+		// double duration = (double) (outHour - inHour) / (1000 * 60 * 60);
 
-		if (duration > 0.5) {
+		// Récupère le temps sous forme LocalDateTime au lieu de Timestamp
+		LocalDateTime inHour = ticket.getInTime();
+		LocalDateTime outHour = ticket.getOutTime();
+		long duration = Duration.between(inHour, outHour).toMinutes();
+
+		if (duration > 30) {
 			switch (ticket.getParkingSpot().getParkingType()) {
 
 			case CAR: {
@@ -54,9 +54,9 @@ public class FareCalculatorService {
 				break;
 			}
 			default:
-				throw new IllegalArgumentException("Unkown Parking Type");
+				throw new IllegalArgumentException("Unknown Parking Type");
 			}
-			price = price * duration;
+			price = price * (duration / 60d);
 		}
 
 		if (regularCustomer) {
@@ -64,6 +64,7 @@ public class FareCalculatorService {
 					"Welcome back! As a recurring user of our parking lot, you'll benefit from a 5% discount.");
 			price = price * 0.95;
 		}
+
 		ticket.setPrice(priceFormatter.formatPrice(price));
 
 	}

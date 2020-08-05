@@ -1,6 +1,6 @@
 package com.parkit.parkingsystem.service;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 import java.util.Optional;
 
 import org.apache.logging.log4j.LogManager;
@@ -51,9 +51,8 @@ public class ParkingService {
 				parkingSpotDAO.updateParking(parkingSpot);// allot this parking space and mark it's availability as
 															// false
 
-				Date inTime = new Date();
-				// LocalDateTime inTime = new LocalDateTime();
-				// inTime = LocalDateTime.now();
+				// Date inTime = new Date();
+				LocalDateTime inTime = LocalDateTime.now();
 				Ticket ticket = new Ticket();
 				// ID, PARKING_NUMBER, VEHICLE_REG_NUMBER, PRICE, IN_TIME, OUT_TIME)
 				ticket.setParkingSpot(parkingSpot);
@@ -148,8 +147,10 @@ public class ParkingService {
 	public void processExitingVehicle() {
 		try {
 			String vehicleRegNumber = getVehicleRegNumber();
+
 			Ticket ticket = ticketDAO.getTicket(vehicleRegNumber);
-			Date outTime = new Date();
+			// Date outTime = new Date();
+			LocalDateTime outTime = LocalDateTime.now();
 			ticket.setOutTime(outTime);
 
 			Optional<Ticket> regularCustomerTicket = ticketDAO.getPreviousRegistration(vehicleRegNumber);
