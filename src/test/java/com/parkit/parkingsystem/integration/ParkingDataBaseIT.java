@@ -141,7 +141,6 @@ public class ParkingDataBaseIT {
 	@Test
 	public void givenInformationForParkedCar_whenProcessExitingVehicle_thenVerifyInformationInTicket()
 			throws Exception {
-		// givenInformationForIncomingCar_whenProcessIncomingVehicle_thenVerifyInformationInTicket();
 		when(inputReaderUtil.readVehicleRegistrationNumber()).thenReturn("ABCDEF");
 		LocalDateTime inTime = LocalDateTime.now();
 		Ticket ticket = new Ticket();
